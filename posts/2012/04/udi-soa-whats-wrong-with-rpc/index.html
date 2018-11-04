@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--[if IE 9]>
+        <script type="text/javascript">
+            window.location = "/browser-compatibility";
+        </script>
+        <![endif]-->
+        <title>What&#x27;s wrong with RPC?</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="My thoughts on coding, architecture, and technology.">
+        
+        <link rel="apple-touch-icon" sizes="57x57" href="/assets/img/icons/apple/apple-touch-icon-57x57.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="60x60" href="/assets/img/icons/apple/apple-touch-icon-60x60.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="72x72" href="/assets/img/icons/apple/apple-touch-icon-72x72.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/icons/apple/apple-touch-icon-76x76.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="114x114" href="/assets/img/icons/apple/apple-touch-icon-114x114.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="120x120" href="/assets/img/icons/apple/apple-touch-icon-120x120.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="144x144" href="/assets/img/icons/apple/apple-touch-icon-144x144.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="152x152" href="/assets/img/icons/apple/apple-touch-icon-152x152.png?v=gAAmLMYXpw">
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/icons/apple/apple-touch-icon-180x180.png?v=gAAmLMYXpw">
+        <link rel="icon" type="image/png" href="/assets/img/icons/favicon/favicon-32x32.png?v=gAAmLMYXpw" sizes="32x32">
+        <link rel="icon" type="image/png" href="/assets/img/icons/favicon/favicon-194x194.png?v=gAAmLMYXpw" sizes="194x194">
+        <link rel="icon" type="image/png" href="/assets/img/icons/favicon/favicon-96x96.png?v=gAAmLMYXpw" sizes="96x96">
+        <link rel="icon" type="image/png" href="/assets/img/icons/android/android-chrome-192x192.png?v=gAAmLMYXpw" sizes="192x192">
+        <link rel="icon" type="image/png" href="/assets/img/icons/favicon/favicon-16x16.png?v=gAAmLMYXpw" sizes="16x16">
+        <link rel="manifest" href="/assets/img/icons/android/manifest.json?v=gAAmLMYXpw">
+        <link rel="mask-icon" href="/assets/img/icons/safari/safari-pinned-tab.svg?v=gAAmLMYXpw" color="#56817a">
+        <link rel="shortcut icon" href="/assets/img/icons/favicon/favicon.ico?v=gAAmLMYXpw">
+        <meta name="msapplication-TileColor" content="#56817a">
+        <meta name="msapplication-TileImage" content="/assets/img/icons/microsoft/mstile-144x144.png?v=gAAmLMYXpw">
+        <meta name="msapplication-config" content="/assets/img/icons/microsoft/browserconfig.xml?v=gAAmLMYXpw">
+        <meta name="theme-color" content="#56817a">
+        <link rel="stylesheet" type="text/css" href=/css/caffeine-theme.css />
+        <style>
+        @font-face{font-family:Raleway;font-weight:400;font-style:normal;src:local('Raleway'),local('Raleway-regular'),url(https://fonts.gstatic.com/s/raleway/v10/QAUlVt1jXOgQavlW5wEfxQLUuEpTyoUstqEm5AMlJo4.woff2) format('woff2'),url(https://fonts.gstatic.com/s/raleway/v10/cIFypx4yrWPDz3zOxk7hIQLUuEpTyoUstqEm5AMlJo4.woff) format('woff'),url(https://fonts.gstatic.com/s/raleway/v10/bIcY3_3JNqUVRAQQRNVteQ.ttf) format('truetype'),url(https://fonts.gstatic.com/l/font?kit=IP_NSg73bUZGuyb3zF6qcQ&skey=30a27f2564731c64&v=v10#Raleway) format('svg')}@font-face{font-family:Raleway;font-weight:700;font-style:normal;src:local('Raleway Bold'),local('Raleway-700'),url(https://fonts.gstatic.com/s/raleway/v10/JbtMzqLaYbbbCL9X6EvaIwzyDMXhdD8sAj6OAJTFsBI.woff2) format('woff2'),url(https://fonts.gstatic.com/s/raleway/v10/JbtMzqLaYbbbCL9X6EvaI73hpw3pgy2gAi-Ip7WPMi0.woff) format('woff'),url(https://fonts.gstatic.com/s/raleway/v10/JbtMzqLaYbbbCL9X6EvaIy3USBnSvpkopQaUR-2r7iU.ttf) format('truetype'),url(https://fonts.gstatic.com/l/font?kit=JbtMzqLaYbbbCL9X6EvaI6WUboTb-jS2tyCOQMtm97g&skey=e507c3e2b7915ad1&v=v10#Raleway) format('svg')}@font-face{font-family:'Roboto Slab';font-weight:300;font-style:normal;src:local('Roboto Slab Light'),local('Roboto-Slab-300'),url(https://fonts.gstatic.com/s/robotoslab/v6/dazS1PrQQuCxC3iOAJFEJdTIkQYohD4BpHvJ3NvbHoA.woff2) format('woff2'),url(https://fonts.gstatic.com/s/robotoslab/v6/dazS1PrQQuCxC3iOAJFEJfR_54zmj3SbGZQh3vCOwvY.woff) format('woff'),url(https://fonts.gstatic.com/s/robotoslab/v6/dazS1PrQQuCxC3iOAJFEJbfB31yxOzP-czbf6AAKCVo.ttf) format('truetype'),url(https://fonts.gstatic.com/l/font?kit=dazS1PrQQuCxC3iOAJFEJT4dnM32POWavC8T_whbZeI&skey=5b48fccf0dc70db6&v=v6#RobotoSlab) format('svg')}@font-face{font-family:'Roboto Slab';font-weight:400;font-style:normal;src:local('Roboto Slab Regular'),local('Roboto-Slab-regular'),url(https://fonts.gstatic.com/s/robotoslab/v6/y7lebkjgREBJK96VQi37Zogp9Q8gbYrhqGlRav_IXfk.woff2) format('woff2'),url(https://fonts.gstatic.com/s/robotoslab/v6/y7lebkjgREBJK96VQi37ZrrIa-7acMAeDBVuclsi6Gc.woff) format('woff'),url(https://fonts.gstatic.com/s/robotoslab/v6/y7lebkjgREBJK96VQi37Zp0EAVxt0G0biEntp43Qt6E.ttf) format('truetype'),url(https://fonts.gstatic.com/l/font?kit=y7lebkjgREBJK96VQi37ZnNsigHlcrQGNV8nkUSFQfc&skey=a9ad6a4717e923f0&v=v6#RobotoSlab) format('svg')}
+        </style>        <script type="text/javascript">
+        try{var storage=window.sessionStorage;storage&&"1"==storage.getItem("fonts-loaded")&&(window.document.documentElement.className+=" fonts-loaded")}catch(e){}
+        </script>
+        <script  src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+        
+        <script type="text/javascript" src="https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.min.js"></script>
+        <script type="text/javascript" src="https://npmcdn.com/masonry-layout@4.0/dist/masonry.pkgd.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/scrollreveal.js/3.0.9/scrollreveal.min.js"></script>
+        <script type="text/javascript">
+        
+        window.ga_id = ""
+        window.disqus_shortname = "codeconfessions"
+        
+        //uncomment for localhost
+        var disqus_developer = 1; 
+        </script>
+    </head>
+    <body class="post">
+        <header id="default-nav-header" class="nav-header nav-header-fixed animated">
+         	<a id="home-button" href="#">
+                 <i class="fa fa-home hvr-grow"></i>    
+             </a>
+            <a class="tags-button right">
+                <i class="fa fa-search hvr-grow"></i>
+            </a>
+        </header>        <aside class="cover animated" style="background-image: url(/images/backgrounds/openbook_min.jpg)">
+            <div class="background-container">
+                <div class="profile">
+                    <header id="aside-header" class="nav-header mobile">
+                        <a id="aside-close-button" class="open-link right">
+                            <i class="fa fa-close"></i>
+                        </a>
+                    </header>
+        
+                   
+                    <div class="profile-logo">
+                        <a id="avatar-link" class="open-link" title="Link to homepage for Code Confessions" href="http://www.codeconfessions.com/#open">
+                        </a>
+                    </div>
+                   
+        
+                    <div class="profile-header">
+                        <a class="open-link" title="Link to homepage for Code Confessions" href="http://www.codeconfessions.com/#open">
+                            <h1 class="profile-title">Code Confessions</h1>
+                        </a>
+                    </div>
+                    <div class="profile-body">
+                        <a class="open-link" title="Link to homepage for Code Confessions" href="http://www.codeconfessions.com/#open">
+                            <h3 id="profile-resume">by Justin Weinberg</h3>
+                        </a>
+                        <hr class="divider long" />
+                        <p>Thoughts on architecture, code, and technology.   My name is Justin Weinberg and I lead the digital innovation team at Essilor.</p>
+                        <hr class="divider short" />
+                            <div class="call-to-action-container">
+                                
+                                <nav class="navigation">
+                                    <ul class="links">
+                                        <li class="nav-blog ">
+                                            <a class="home-link" href="http://www.codeconfessions.com/#open" title="Code Confessions blog">Blog</a>
+                                        </li>
+                                       
+                                           <li class="nav-archives ">
+                                                     <a href="/archives">Archives</a>
+                                           </li>           <li class="nav-About ">
+                                                     <a href="/about">About</a>
+                                           </li>    </ul>
+                                </nav>
+                            </div>
+                    </div>
+                    <ul class="social expanded">
+                    
+                    
+                        <li class="social item hvr-grow-rotate">
+                            <a rel="me" target="_blank" href="http://www.twitter.com/codeconfessions" title="@codeconfessions on Twitter">
+                                <i class='fa fa-twitter'></i>
+                                <span class="label">Twitter</span>
+                            </a>
+                        </li>
+                    
+                        <li class="social item hvr-grow-rotate">
+                            <a rel="me" target="_blank" href="https://www.linkedin.com/in/modrg" title="Justin on LinkedIn">
+                                <i class='fa fa-linkedin-square'></i>
+                                <span class="label">Linkedin</span>
+                            </a>
+                        </li>
+                    
+                        <li class="social item hvr-grow-rotate">
+                            <a rel="me" target="_blank" href="https://github.com/justinweinberg" title="Justin on Github">
+                                <i class='fa fa-github'></i>
+                                <span class="label">Github</span>
+                            </a>
+                        </li>
+                    
+                    
+                        <li class="social item hvr-grow-rotate">
+                            <a href="/rss/index.xml" title="Subscribe to RSS">
+                                <i class='fa fa-rss'></i>
+                                <span class="label">RSS</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+        
+        <div class="blog-header">
+            <a title="Link to homepage for Code Confessions" href="http://www.codeconfessions.com/#open">
+                <h1 class="profile-title hvr-float">Code Confessions</h1>
+            </a>
+            
+            <nav class="navigation">
+                <ul class="links">
+                    <li class="nav-blog ">
+                        <a class="home-link" href="http://www.codeconfessions.com/#open" title="Code Confessions blog">Blog</a>
+                    </li>
+                   
+                       <li class="nav-archives ">
+                                 <a href="/archives">Archives</a>
+                       </li>           <li class="nav-About ">
+                                 <a href="/about">About</a>
+                       </li>    </ul>
+            </nav>
+        </div>        <main class="animated">
+            <section class="content">
+                
+
+  <article class="post tag-code tag-guide">
+    <div class="material-cover animated fade-in" style="background-image: url(/posts/2012/04/udi-soa-whats-wrong-with-rpc/unplugged.jpg)">
+         <div class="background-container"></div>
+    </div>    <div class="post-card animated fade-in">
+        <a id="back-button" href="#open" title="Go back" class="hvr-grow">
+            <div class="back-button">
+                <i class="fa fa-arrow-left"></i>
+            </div>
+        </a>
+        <div class="post-container">
+            <div class="post-header">
+                <div class="meta">
+                     <time datetime="April 10, 2012">7 years ago</time>
+                    <span class="tags">  <a href="/tags/SOA/" title="SOA">SOA</a>
+  <a href="/tags/architecture/" title="architecture">architecture</a>
+
+
+</span>
+                    <span class="reading-time"> ~ <span></span> read.</span>
+      
+
+                </div>
+                <h1 id="post-title">
+                    What's wrong with RPC?
+                </h1>
+                <div class="share">
+                        <ul class="share-buttons">
+                        <li class="hvr-grow-rotate">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.codeconfessions.composts%2F2012%2F04%2Fudi-soa-whats-wrong-with-rpc%2F&t=What&#x27;s%20wrong%20with%20RPC%3F" target="_blank" title="Share on Facebook">
+                                <i class="fa fa-facebook-square"></i>
+                            </a>
+                        </li>
+                        <li class="hvr-grow-rotate">
+                            <a href="https://twitter.com/intent/tweet?source=http%3A%2F%2Fwww.codeconfessions.composts%2F2012%2F04%2Fudi-soa-whats-wrong-with-rpc%2F&text=What&#x27;s%20wrong%20with%20RPC%3F:http%3A%2F%2Fwww.codeconfessions.composts/2012/04/udi-soa-whats-wrong-with-rpc/" target="_blank" title="Tweet">
+                                <i class="fa fa-twitter-square"></i>
+                            </a>
+                        </li>
+                        <li class="hvr-grow-rotate">
+                            <a href="https://plus.google.com/share?url=http%3A%2F%2Fwww.codeconfessions.composts%2F2012%2F04%2Fudi-soa-whats-wrong-with-rpc%2F" target="_blank" title="Share on Google+">
+                                <i class="fa fa-google-plus-square"></i>
+                            </a>
+                        </li>
+                        <li class="hvr-grow-rotate">
+                            <a href="http://www.reddit.com/submit?url=http%3A%2F%2Fwww.codeconfessions.composts%2F2012%2F04%2Fudi-soa-whats-wrong-with-rpc%2F&title=What&#x27;s%20wrong%20with%20RPC%3F" target="_blank" title="Submit to Reddit">
+                                <i class="fa fa-reddit-square"></i>
+                            </a>
+                        </li>
+                        <li class="hvr-grow-rotate">
+                            <a href="http://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Fwww.codeconfessions.composts%2F2012%2F04%2Fudi-soa-whats-wrong-with-rpc%2F&title=What&#x27;s%20wrong%20with%20RPC%3F&source=http%3A%2F%2Fwww.codeconfessions.composts%2F2012%2F04%2Fudi-soa-whats-wrong-with-rpc%2F" target="_blank" title="Share on LinkedIn">
+                                <i class="fa fa-linkedin-square"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    
+                </div>
+            </div>
+             <div class="post-content">
+                <p>In my last post I lamented the pain felt applying object orientation to distributed architectures<a id="more"></a>  but I didn’t talk about why. To understand this, it helps to look back to Peter Deutch’s fallacies of distributed computing (If you want to learn more about these fallacies <a href="http://www.rgoarchitects.com/Files/fallacies.pdf" target="_blank" rel="noopener">go here</a>)</p>
+<p>One of the first systems I developed was a wireless restaurant point of sale system. A key feature was waitstaff could send customer orders wirelessly with handheld devices to a backend server. This sounds like a simple enough system to build. And it is at development time with a device emulator running on the same machine as the application server. With this setup, it’s easy to fall into a trap. We code oblivious to Peter’s first fallacy, that the <strong>network is reliable</strong>, because we abstracted the network away somewhere. All is fine until deployment, because that is when Microwave ovens disrupt 802.11B devices, staff trip over cords and send PCs or switches offline and phone systems go in that compete with your wireless signal. That is when impenetrable cinderblock walls and the electric surges of heavy machinery wreak havoc on your network.</p>
+<p>RPC (remote procedure call) technologies make the situation worse. Network is down? You get a timeout error. Want to retry? Implement it yourself.</p>
+<p>I did that with the restaurant system. I devised retry logic so that waitstaff could move back into the wireless range and try sending the order again if it failed the first time. But this introduces another problem with RPC over unreliable networks. With RPC there are two distinct outcomes for a timeout. First, the RPC call may have never reached the server. In the case of our restaurant system, we would have hungry, angry customers unless the system retries to send the order. But what about the second outcome? What if the order did reach the server and the timeout occurred on the way back? If this is the case, and the waitstaff retries, the order is received twice. This means we requested double food (unless our services are <a href="http://en.wikipedia.org/wiki/Idempotence" target="_blank" rel="noopener">idempotent</a>)!</p>
+<p>So is RPC over networks always bad? Actually many successful, distributed systems have been built on RPC. To say “the network is unreliable” is too binary. Reliability is a range with my scary restaurant network on one side and mission critical no single point of failure networks on the other. The abstractions afforded by RPC are acceptable for many non mission critical systems. Yet if there is another pattern, another abstraction that’s not much more complicated and does bring more reliability, shouldn’t we look to it?</p>
+<p>When it has to be as reliable as possible, there are two choices. First, you can implement socket level communication. This means doing the connects, retries, and reconnects yourself. I’ve done that when implementing clients for mainframe messaging. It’s not terribly fun but it is effective. Second, you can use a reliable messaging pattern to smooth out the inherently unreliable network. In a future post I’ll talk about what patterns are applicable.</p>
+<p>In the end, there is no 100% reliability once you introduce a network. This is clearly illustrated by the <a href="https://en.wikipedia.org/wiki/Two_Generals%27_Problem" target="_blank" rel="noopener">Two Generals Problem</a>. But that doesn’t mean we should throw up our hands. It means we need to do what we’ve always done as IT professionals – make good tradeoffs and think deeply about when and where we need specific nonfunctional requirements such as levels of reliabiity.</p>
+
+            </div>
+            <footer class="comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    (function() {
+                        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                        dsq.src = '//' + window.disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </footer>
+        </div>
+    </div>
+     
+    
+    <div class="post-related pagination">
+            <a rel="prev" id="prev-btn" class="btn hvr-grow" href="/posts/2012/04/udi-soa-11th-fallacy/">
+                <i class="fa fa-arrow-left"></i>
+                <span>Distributed Computing: The 11th Fallacy</span>
+            </a>
+            <a rel="next" id="next-btn" class="btn hvr-grow" href="/posts/2012/04/udi-soa-we-use-the-wrong-patterns/">
+                <span>We use the Wrong Patterns</span>
+                <i class="fa fa-arrow-right"></i>
+            </a>
+        <div class="clear"></div>
+    </div>  </article>
+ 
+
+                <footer>
+                    <span class="copyright">
+                        &copy; 2016 
+                         All Rights Reserved. | <a href="/attribution">Creative Commons Attribution</a> | Ported to Hexo from  <a href="https://github.com/kelyvin/caffeine-theme" target="_blank">Caffeine Theme</a>
+                    </span>
+                </footer>
+            </section>
+        </main>
+        <aside class="tags-overlay animated">
+            <div class="tags-overlay container">
+                <section id="search-container" class="search-container">
+                    <form id="search-form" class="search-form">
+                        <input id="search-field" class="search-field" type="text", name="search", placeholder="git, code, javascript,..." />
+                    </form>
+                    <hr class="divider short" />
+                </section>
+                <section  id="search-results"  class="search-results"></section>        
+                <div id="popular-tags" class="tags-container">
+                    <h2>Categories</h2>
+                    <div class="tags">
+                  <a href="/categories/talks/" title="talks">talks</a>
+                  <a href="/categories/craft/" title="craft">craft</a>
+                    </div>
+                </div>    </div>
+        </aside>
+        <script src=/js/caffeine-theme.js type="text/javascript" charset="utf-8"></script>
+        <script>
+            if (window.ga_id) {
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                ga('create', window.ga_id, 'auto');
+                ga('require', 'linkid', 'linkid.js');
+                ga('send', 'pageview');
+            }
+        </script>
+        <script type="text/javascript">
+            (function () {
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + window.disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        </script>    </body>
+</html>
+
+
+
